@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <!-- Welcome Section -->
+    <div class="bg-gradient-to-r from-blue-500 to-blue-600 text-white p-6 rounded-lg mb-6">
+        <h1 class="text-2xl font-bold mb-2">Welcome, {{ student.full_name }}!</h1>
+        <p class="text-blue-100">Track your placement journey here</p>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="grid md:grid-cols-4 gap-6 mb-8">
+        <div class="bg-white p-6 rounded-lg shadow-md">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-gray-500 text-sm">Applications</p>
+                    <p class="text-2xl font-bold">{{ applications|length }}</p>
+                </div>
+                <span class="material-icons text-blue-500 text-3xl">assignment</span>
+            </div>
+        </div>
+        
+        <div class="bg-white p-6 rounded-lg shadow-md">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-gray-500 text-sm">Shortlisted</p>
+                    <p class="text-2xl font-bold">{{ applications|selectattr('status', 'equalto', 'shortlisted')|list|length }}</p>
+                </div>
+                <span class="material-icons text-green-500 text-3xl">check_circle</span>
+            </div>
+        </div>
+        
+        <div class="bg-white p-6 rounded-lg shadow-md">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-gray-500 text-sm">Pending</p>
+                    <p class="text-2xl font-bold">{{ applications|selectattr('status', 'equalto', 'pending')|list|length }}</p>
+                </div>
+                <span class="material-icons text-yellow-500 text-3xl">hourglass_empty</span>
+            </div>
+        </div>
+        
+        <div class="bg-white p-6 rounded-lg shadow-md">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-gray-500 text-sm">CGPA</p>
+                    <p class="text-2xl font-bold">{{ student.cgpa }}</p>
+                </div>
+                <span class="material-icons text-purple-500 text-3xl">star</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Jobs -->
+    <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="text-xl font-bold">Recent Job Postings</h2>
+            <a href="{{ url_for('student_jobs') }}" class="text-blue-600 hover:text-blue-800">View All</a>
+        </div>
+        
+        <div class="space-y-4">
+            {% for job in jobs %}
+            <div class="border rounded-lg p-4 hover:shadow-md transition">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <h3 class="font-semibold text-lg">{{ job.title }}</h3>
+                        <p class="text-gray-600">{{ job.company.company_name }}</p>
+                        <div class="flex items-center space-x-4 mt-2 text-sm text-gray-500">
+                            <span class="flex items-center">
+                                <span class="material-icons text-sm mr-1">location_on</span>
+                                {{ job.location }}
+                            </span>
+                            <span class="flex items-center">
+                                <span class="material-icons text-sm mr-1">attach_money</span>
+                                {{ job.salary }}
+                            </span>
+                            <span class="flex items-center">
+                                <span class="material-icons text-sm mr-1">calendar_today</span>
+                                {{ job.last_date.strftime('%d-%m-%Y') }}
+                            </span>
+                        </div>
+                    </div>
+                    <a href="{{ url_for('apply_job', job_id=job.id) }}" 
+                       class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700">
+                        Apply Now
+                    </a>
+                </div>
+            </div>
+            {% else %}
+            <p class="text-gray-500 text-center py-4">No jobs available at the moment</p>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Recent Applications -->
+    <div class="bg-white rounded-lg shadow-md p-6">
+        <h2 class="text-xl font-bold mb-4">Recent Applications</h2>
+        
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead>
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Job Title</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Company</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Applied Date</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    {% for app in applications[:5] %}
+                    <tr>
+                        <td class="px-6 py-4 whitespace-nowrap">{{ app.job.title }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">{{ app.job.company.company_name }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">{{ app.applied_date.strftime('%d-%m-%Y') }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                                {% if app.status == 'selected' %}bg-green-100 text-green-800
+                                {% elif app.status == 'rejected' %}bg-red-100 text-red-800
+                                {% elif app.status == 'shortlisted' %}bg-blue-100 text-blue-800
+                                {% else %}bg-yellow-100 text-yellow-800{% endif %}">
+                                {{ app.status }}
+                            </span>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="4" class="px-6 py-4 text-center text-gray-500">No applications yet</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

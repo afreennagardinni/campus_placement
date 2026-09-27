@@ -1,0 +1,280 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="mb-6">
+        <h1 class="text-2xl font-bold">{{ job.title }} - Applications</h1>
+        <p class="text-gray-600">Total Applications: {{ applications|length }}</p>
+    </div>
+
+    <!-- Status Summary Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
+        <div class="bg-white p-4 rounded-lg shadow-md border-l-4 border-gray-400">
+            <div class="text-sm text-gray-600">Total</div>
+            <div class="text-2xl font-bold">{{ applications|length }}</div>
+        </div>
+        <div class="bg-white p-4 rounded-lg shadow-md border-l-4 border-yellow-400">
+            <div class="text-sm text-gray-600">Pending</div>
+            <div class="text-2xl font-bold text-yellow-600">{{ applications|selectattr('status', 'equalto', 'pending')|list|length }}</div>
+        </div>
+        <div class="bg-white p-4 rounded-lg shadow-md border-l-4 border-blue-400">
+            <div class="text-sm text-gray-600">Shortlisted</div>
+            <div class="text-2xl font-bold text-blue-600">{{ applications|selectattr('status', 'equalto', 'shortlisted')|list|length }}</div>
+        </div>
+        <div class="bg-white p-4 rounded-lg shadow-md border-l-4 border-green-400">
+            <div class="text-sm text-gray-600">Selected</div>
+            <div class="text-2xl font-bold text-green-600">{{ applications|selectattr('status', 'equalto', 'selected')|list|length }}</div>
+        </div>
+        <div class="bg-white p-4 rounded-lg shadow-md border-l-4 border-red-400">
+            <div class="text-sm text-gray-600">Rejected</div>
+            <div class="text-2xl font-bold text-red-600">{{ applications|selectattr('status', 'equalto', 'rejected')|list|length }}</div>
+        </div>
+    </div>
+
+    <!-- Action Buttons for Bulk Operations -->
+    <div class="bg-white p-4 rounded-lg shadow-md mb-6 flex flex-wrap gap-4">
+        {% set shortlisted_count = applications|selectattr('status', 'equalto', 'shortlisted')|list|length %}
+        {% set interviewed_count = applications|selectattr('interview_scheduled', 'equalto', true)|list|length %}
+        {% set selected_count = applications|selectattr('status', 'equalto', 'selected')|list|length %}
+        
+        {% if shortlisted_count > 0 %}
+        <a href="{{ url_for('schedule_interview', job_id=job.id) }}" 
+           class="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 inline-flex items-center">
+            <span class="material-icons mr-2">calendar_today</span>
+            Schedule Interview ({{ shortlisted_count }})
+        </a>
+        {% endif %}
+        
+        {% if interviewed_count > 0 %}
+        <a href="{{ url_for('final_selection', job_id=job.id) }}" 
+           class="bg-yellow-600 text-white px-4 py-2 rounded-lg hover:bg-yellow-700 inline-flex items-center">
+            <span class="material-icons mr-2">how_to_reg</span>
+            Final Selection ({{ interviewed_count }})
+        </a>
+        {% endif %}
+        
+        {% if selected_count > 0 %}
+        <a href="{{ url_for('generate_offer_letters', job_id=job.id) }}" 
+           class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 inline-flex items-center">
+            <span class="material-icons mr-2">description</span>
+            Generate Offer Letters ({{ selected_count }})
+        </a>
+        {% endif %}
+        
+        <a href="{{ url_for('post_job') }}" 
+           class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 inline-flex items-center ml-auto">
+            <span class="material-icons mr-2">add</span>
+            Post New Job
+        </a>
+    </div>
+
+    <!-- Applications Table -->
+    <div class="bg-white rounded-lg shadow-md overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Student</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Department</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">CGPA</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Applied Date</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Interview</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    {% for application in applications %}
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4">
+                            <div class="font-medium text-gray-900">{{ application.student.full_name }}</div>
+                            <div class="text-sm text-gray-500">{{ application.student.roll_number }}</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">{{ application.student.department }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">{{ application.student.cgpa }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">{{ application.applied_date.strftime('%d-%m-%Y') }}</td>
+                        <td class="px-6 py-4">
+                            {% if application.interview_scheduled %}
+                                <span class="text-sm">
+                                    <span class="font-medium">{{ application.interview_date }}</span><br>
+                                    <span class="text-gray-500">{{ application.interview_time }}</span>
+                                </span>
+                                {% if application.interview_mode %}
+                                <span class="text-xs text-gray-500 block">({{ application.interview_mode }})</span>
+                                {% endif %}
+                            {% else %}
+                                <span class="text-gray-400">Not scheduled</span>
+                            {% endif %}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <select onchange="updateStatus({{ application.id }}, this.value)" 
+                                    class="border rounded-lg px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500
+                                    {% if application.status == 'selected' %}bg-green-100 text-green-800 border-green-300
+                                    {% elif application.status == 'rejected' %}bg-red-100 text-red-800 border-red-300
+                                    {% elif application.status == 'shortlisted' %}bg-blue-100 text-blue-800 border-blue-300
+                                    {% else %}bg-yellow-100 text-yellow-800 border-yellow-300{% endif %}">
+                                <option value="pending" {% if application.status == 'pending' %}selected{% endif %}>Pending</option>
+                                <option value="shortlisted" {% if application.status == 'shortlisted' %}selected{% endif %}>Shortlist</option>
+                                <option value="rejected" {% if application.status == 'rejected' %}selected{% endif %}>Reject</option>
+                                <option value="selected" {% if application.status == 'selected' %}selected{% endif %}>Select</option>
+                            </select>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="flex space-x-2">
+                                {% if application.student.resume_path %}
+                                <a href="{{ application.student.resume_path }}" target="_blank" 
+                                   class="text-blue-600 hover:text-blue-900" title="View Resume">
+                                    <span class="material-icons">description</span>
+                                </a>
+                                {% endif %}
+                                
+                                {% if application.status == 'shortlisted' and not application.interview_scheduled %}
+                                <a href="{{ url_for('schedule_interview', job_id=job.id) }}" 
+                                   class="text-purple-600 hover:text-purple-900" title="Schedule Interview">
+                                    <span class="material-icons">calendar_month</span>
+                                </a>
+                                {% endif %}
+                                
+                                {% if application.interview_scheduled and application.status == 'shortlisted' %}
+                                <a href="{{ url_for('conduct_interview', job_id=job.id, app_id=application.id) }}" 
+                                   class="text-yellow-600 hover:text-yellow-900" title="Conduct Interview">
+                                    <span class="material-icons">record_voice_over</span>
+                                </a>
+                                {% endif %}
+                                
+                                {% if application.status == 'selected' %}
+                                    {% if application.offer_letter_generated %}
+                                    <span class="text-green-600" title="Offer Letter Generated">
+                                        <span class="material-icons">check_circle</span>
+                                    </span>
+                                    {% else %}
+                                    <a href="{{ url_for('generate_offer_letters', job_id=job.id) }}" 
+                                       class="text-green-600 hover:text-green-900" title="Generate Offer Letter">
+                                        <span class="material-icons">file_present</span>
+                                    </a>
+                                    {% endif %}
+                                {% endif %}
+                                
+                                {% if application.offer_accepted %}
+                                <span class="text-blue-600" title="Offer Accepted">
+                                    <span class="material-icons">handshake</span>
+                                </span>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="7" class="px-6 py-12 text-center">
+                            <span class="material-icons text-5xl text-gray-400 mb-3">people_outline</span>
+                            <p class="text-gray-500 text-lg">No applications yet</p>
+                            <p class="text-gray-400 text-sm mt-1">Students will appear here when they apply</p>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Interview Schedule Summary (if any) -->
+    {% set scheduled = applications|selectattr('interview_scheduled', 'equalto', true)|list %}
+    {% if scheduled|length > 0 %}
+    <div class="mt-8 bg-white rounded-lg shadow-md p-6">
+        <h2 class="text-xl font-bold mb-4">Interview Schedule Summary</h2>
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {% for app in scheduled %}
+            <div class="border rounded-lg p-4 hover:shadow-md transition">
+                <div class="font-semibold">{{ app.student.full_name }}</div>
+                <div class="text-sm text-gray-600">{{ app.student.department }} - {{ app.student.roll_number }}</div>
+                <div class="mt-2 text-sm">
+                    <div class="flex items-center text-gray-700">
+                        <span class="material-icons text-sm mr-1">event</span>
+                        {{ app.interview_date }}
+                    </div>
+                    <div class="flex items-center text-gray-700">
+                        <span class="material-icons text-sm mr-1">schedule</span>
+                        {{ app.interview_time }}
+                    </div>
+                    <div class="flex items-center text-gray-700">
+                        <span class="material-icons text-sm mr-1">location_on</span>
+                        {{ app.interview_mode }} - {{ app.interview_location or 'TBD' }}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<!-- JavaScript for Status Update -->
+<script>
+function updateStatus(appId, status) {
+    if(confirm('Are you sure you want to change application status to ' + status + '?')) {
+        fetch(`/company/application/${appId}/update`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({status: status})
+        })
+        .then(response => response.json())
+        .then(data => {
+            if(data.success) {
+                // Show success message
+                alert('Status updated successfully!');
+                // Reload page to reflect changes
+                location.reload();
+            } else {
+                alert('Error updating status');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred');
+        });
+    }
+}
+
+// Auto-refresh for real-time updates (optional)
+// setTimeout(function() {
+//     location.reload();
+// }, 300000); // Refresh every 5 minutes
+</script>
+
+<!-- Export to Excel Button (Optional) -->
+<div class="mt-4 flex justify-end">
+    <button onclick="exportToExcel()" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 inline-flex items-center">
+        <span class="material-icons mr-2">download</span>
+        Export to Excel
+    </button>
+</div>
+
+<script>
+function exportToExcel() {
+    // Create CSV content
+    let csv = "Student Name,Roll Number,Department,CGPA,Applied Date,Status,Interview Date,Interview Time\n";
+    
+    {% for app in applications %}
+    csv += "{{ app.student.full_name }},";
+    csv += "{{ app.student.roll_number }},";
+    csv += "{{ app.student.department }},";
+    csv += "{{ app.student.cgpa }},";
+    csv += "{{ app.applied_date.strftime('%d-%m-%Y') }},";
+    csv += "{{ app.status }},";
+    csv += "{{ app.interview_date or 'Not scheduled' }},";
+    csv += "{{ app.interview_time or '' }}\n";
+    {% endfor %}
+    
+    // Download CSV
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'applications_{{ job.title }}.csv';
+    a.click();
+    window.URL.revokeObjectURL(url);
+}
+</script>
+{% endblock %}

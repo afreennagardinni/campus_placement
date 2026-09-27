@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <!-- Welcome Section -->
+    <div class="bg-gradient-to-r from-purple-500 to-purple-600 text-white p-6 rounded-lg mb-6">
+        <h1 class="text-2xl font-bold mb-2">Admin Dashboard</h1>
+        <p class="text-purple-100">Manage students, companies, and monitor placement activities</p>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="grid md:grid-cols-4 gap-6 mb-8">
+        <div class="bg-white p-6 rounded-lg shadow-md">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-gray-500 text-sm">Total Students</p>
+                    <p class="text-2xl font-bold">{{ total_students }}</p>
+                </div>
+                <span class="material-icons text-blue-500 text-3xl">school</span>
+            </div>
+        </div>
+        
+        <div class="bg-white p-6 rounded-lg shadow-md">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-gray-500 text-sm">Total Companies</p>
+                    <p class="text-2xl font-bold">{{ total_companies }}</p>
+                </div>
+                <span class="material-icons text-green-500 text-3xl">business</span>
+            </div>
+        </div>
+        
+        <div class="bg-white p-6 rounded-lg shadow-md">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-gray-500 text-sm">Total Jobs</p>
+                    <p class="text-2xl font-bold">{{ total_jobs }}</p>
+                </div>
+                <span class="material-icons text-yellow-500 text-3xl">work</span>
+            </div>
+        </div>
+        
+        <div class="bg-white p-6 rounded-lg shadow-md">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-gray-500 text-sm">Students Placed</p>
+                    <p class="text-2xl font-bold">{{ total_placements }}</p>
+                </div>
+                <span class="material-icons text-purple-500 text-3xl">celebration</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pending Verifications -->
+    <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+        <h2 class="text-xl font-bold mb-4">Pending Company Verifications</h2>
+        <p class="text-gray-600 mb-4">{{ pending_companies }} companies awaiting verification</p>
+        <a href="{{ url_for('manage_companies') }}" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
+            Review Companies
+        </a>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="grid md:grid-cols-2 gap-6">
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <h2 class="text-xl font-bold mb-4">Quick Actions</h2>
+            <div class="space-y-3">
+                <a href="{{ url_for('manage_students') }}" class="flex items-center p-3 bg-gray-50 rounded-lg hover:bg-gray-100">
+                    <span class="material-icons text-blue-600 mr-3">people</span>
+                    <span>Manage Students</span>
+                </a>
+                <a href="{{ url_for('manage_companies') }}" class="flex items-center p-3 bg-gray-50 rounded-lg hover:bg-gray-100">
+                    <span class="material-icons text-green-600 mr-3">business_center</span>
+                    <span>Manage Companies</span>
+                </a>
+                <a href="{{ url_for('admin_reports') }}" class="flex items-center p-3 bg-gray-50 rounded-lg hover:bg-gray-100">
+                    <span class="material-icons text-purple-600 mr-3">assessment</span>
+                    <span>View Reports</span>
+                </a>
+            </div>
+        </div>
+        
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <h2 class="text-xl font-bold mb-4">System Overview</h2>
+            <div class="space-y-4">
+                <div>
+                    <div class="flex justify-between mb-1">
+                        <span class="text-sm text-gray-600">Placement Rate</span>
+                        <span class="text-sm font-semibold">{{ (total_placements/total_students*100)|round|int if total_students > 0 else 0 }}%</span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-2">
+                        <div class="bg-green-600 h-2 rounded-full" style="width: {{ (total_placements/total_students*100) if total_students > 0 else 0 }}%"></div>
+                    </div>
+                </div>
+                <div>
+                    <div class="flex justify-between mb-1">
+                        <span class="text-sm text-gray-600">Active Jobs</span>
+                        <span class="text-sm font-semibold">{{ total_jobs }}</span>
+                    </div>
+                </div>
+                <div>
+                    <div class="flex justify-between mb-1">
+                        <span class="text-sm text-gray-600">Verified Companies</span>
+                        <span class="text-sm font-semibold">{{ total_companies - pending_companies }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

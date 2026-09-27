@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="bg-white rounded-lg shadow-md p-6">
+        <h1 class="text-2xl font-bold mb-4">Apply for {{ job.title }}</h1>
+        
+        <div class="bg-blue-50 p-4 rounded-lg mb-6">
+            <h2 class="font-semibold text-lg mb-2">Job Details</h2>
+            <p><span class="font-medium">Company:</span> {{ job.company.company_name }}</p>
+            <p><span class="font-medium">Location:</span> {{ job.location }}</p>
+            <p><span class="font-medium">Salary:</span> {{ job.salary }}</p>
+            <p><span class="font-medium">Last Date:</span> {{ job.last_date.strftime('%d-%m-%Y') }}</p>
+            <p><span class="font-medium">Minimum CGPA Required:</span> {{ job.min_cgpa }}</p>
+        </div>
+        
+        <div class="mb-6">
+            <h2 class="font-semibold text-lg mb-2">Your Profile</h2>
+            <p><span class="font-medium">Name:</span> {{ student.full_name }}</p>
+            <p><span class="font-medium">Roll Number:</span> {{ student.roll_number }}</p>
+            <p><span class="font-medium">Department:</span> {{ student.department }}</p>
+            <p><span class="font-medium">CGPA:</span> {{ student.cgpa }}</p>
+            <p><span class="font-medium">Skills:</span> {{ student.skills or 'Not specified' }}</p>
+        </div>
+        
+        {% if student.cgpa >= job.min_cgpa %}
+            <form method="POST">
+                <p class="text-green-600 mb-4">✓ You are eligible for this position</p>
+                <button type="submit" class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 w-full">
+                    Confirm Application
+                </button>
+            </form>
+        {% else %}
+            <div class="bg-red-50 p-4 rounded-lg">
+                <p class="text-red-600">✗ You are not eligible. Minimum CGPA required is {{ job.min_cgpa }}</p>
+            </div>
+        {% endif %}
+        
+        <div class="mt-4 text-center">
+            <a href="{{ url_for('student_jobs') }}" class="text-blue-600 hover:text-blue-800">
+                ← Back to Jobs
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

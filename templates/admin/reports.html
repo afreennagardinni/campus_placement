@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="mb-6">
+        <h1 class="text-2xl font-bold">Placement Reports</h1>
+        <p class="text-gray-600">View placement statistics and analytics</p>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="grid md:grid-cols-4 gap-6 mb-8">
+        <div class="bg-white p-6 rounded-lg shadow-md">
+            <div class="text-3xl font-bold text-blue-600">{{ placement_rate|round|int }}%</div>
+            <div class="text-gray-600">Placement Rate</div>
+        </div>
+        <div class="bg-white p-6 rounded-lg shadow-md">
+            <div class="text-3xl font-bold text-green-600">{{ placed_students }}</div>
+            <div class="text-gray-600">Students Placed</div>
+        </div>
+        <div class="bg-white p-6 rounded-lg shadow-md">
+            <div class="text-3xl font-bold text-purple-600">{{ total_students }}</div>
+            <div class="text-gray-600">Total Students</div>
+        </div>
+        <div class="bg-white p-6 rounded-lg shadow-md">
+            <div class="text-3xl font-bold text-yellow-600">{{ total_students - placed_students }}</div>
+            <div class="text-gray-600">Not Placed</div>
+        </div>
+    </div>
+
+    <!-- Department-wise Report -->
+    <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+        <h2 class="text-xl font-bold mb-4">Department-wise Placement</h2>
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead>
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Department</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Total Students</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Placed</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Placement %</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for dept in departments %}
+                    <tr>
+                        <td class="px-6 py-4">{{ dept.department }}</td>
+                        <td class="px-6 py-4">{{ dept.total }}</td>
+                        <td class="px-6 py-4">{{ dept.placed }}</td>
+                        <td class="px-6 py-4">{{ (dept.placed/dept.total*100)|round|int if dept.total > 0 else 0 }}%</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

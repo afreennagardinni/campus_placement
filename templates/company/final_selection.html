@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="bg-white rounded-lg shadow-md p-6">
+        <h1 class="text-2xl font-bold mb-4">Final Selection - {{ job.title }}</h1>
+        
+        <div class="bg-yellow-50 p-4 rounded-lg mb-6">
+            <p class="text-yellow-700">
+                <span class="font-semibold">Note:</span> Select the candidates who passed the interview process.
+            </p>
+        </div>
+        
+        <form method="POST" id="selectionForm">
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Select</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Student</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Roll No</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Department</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">CGPA</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Interview</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Remarks</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for app in applications %}
+                        <tr class="hover:bg-gray-50">
+                            <td class="px-6 py-4">
+                                <input type="checkbox" name="selected_students" value="{{ app.id }}"
+                                       class="h-5 w-5 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                            </td>
+                            <td class="px-6 py-4 font-medium">{{ app.student.full_name }}</td>
+                            <td class="px-6 py-4">{{ app.student.roll_number }}</td>
+                            <td class="px-6 py-4">{{ app.student.department }}</td>
+                            <td class="px-6 py-4">{{ app.student.cgpa }}</td>
+                            <td class="px-6 py-4">
+                                <span class="text-sm">
+                                    {{ app.interview_date }}<br>{{ app.interview_time }}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4">
+                                <input type="text" name="remarks_{{ app.id }}" 
+                                       placeholder="Interview remarks"
+                                       class="border rounded px-2 py-1 text-sm w-full">
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="7" class="px-6 py-12 text-center text-gray-500">
+                                No candidates scheduled for interview
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="mt-6 flex justify-end space-x-4">
+                <a href="{{ url_for('job_applications', job_id=job.id) }}" 
+                   class="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
+                    Cancel
+                </a>
+                <button type="submit" class="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700">
+                    Confirm Final Selection
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+document.getElementById('selectionForm').addEventListener('submit', function(e) {
+    let checked = document.querySelectorAll('input[name="selected_students"]:checked');
+    if(checked.length === 0) {
+        e.preventDefault();
+        alert('Please select at least one candidate');
+    }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Offer Letter - {{ student.full_name }}</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 20px;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #333;
+            padding-bottom: 20px;
+        }
+        .company-name {
+            font-size: 24px;
+            font-weight: bold;
+            color: #1e40af;
+        }
+        .offer-title {
+            font-size: 20px;
+            font-weight: bold;
+            margin: 20px 0;
+            text-align: center;
+        }
+        .content {
+            margin: 30px 0;
+        }
+        .details {
+            margin: 20px 0;
+            padding: 20px;
+            background-color: #f9fafb;
+            border-radius: 5px;
+        }
+        .detail-row {
+            margin: 10px 0;
+        }
+        .label {
+            font-weight: bold;
+            display: inline-block;
+            width: 200px;
+        }
+        .signature {
+            margin-top: 50px;
+        }
+        .footer {
+            margin-top: 50px;
+            font-size: 12px;
+            text-align: center;
+            color: #666;
+            border-top: 1px solid #ccc;
+            padding-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="company-name">{{ company.company_name }}</div>
+        <div>{{ company.location }}</div>
+        <div>{{ company.website }}</div>
+    </div>
+    
+    <div class="offer-title">OFFER OF EMPLOYMENT</div>
+    
+    <div class="content">
+        <p><strong>Date:</strong> {{ date }}</p>
+        <p><strong>Offer Letter No:</strong> {{ offer_no }}</p>
+        
+        <p>To,<br>
+        <strong>{{ student.full_name }}</strong><br>
+        Roll No: {{ student.roll_number }}<br>
+        Department: {{ student.department }}<br>
+        {{ student.user.email }}<br>
+        Phone: {{ student.phone }}</p>
+        
+        <p>Dear {{ student.full_name }},</p>
+        
+        <p>We are pleased to offer you the position of <strong>{{ job.title }}</strong> at <strong>{{ company.company_name }}</strong>. After reviewing your qualifications and performance in our selection process, we believe you will be a valuable addition to our team.</p>
+        
+        <div class="details">
+            <h3>Position Details:</h3>
+            <div class="detail-row"><span class="label">Job Title:</span> {{ job.title }}</div>
+            <div class="detail-row"><span class="label">Location:</span> {{ job.location }}</div>
+            <div class="detail-row"><span class="label">Employment Type:</span> {{ job.job_type }}</div>
+            <div class="detail-row"><span class="label">Probation Period:</span> 6 months</div>
+            
+            <h3>Compensation:</h3>
+            <div class="detail-row"><span class="label">Annual CTC:</span> {{ job.salary }}</div>
+            <div class="detail-row"><span class="label">Other Benefits:</span> PF, Medical Insurance, Gratuity</div>
+            
+            <h3>Joining Details:</h3>
+            <div class="detail-row"><span class="label">Expected Joining Date:</span> Within 30 days of acceptance</div>
+            <div class="detail-row"><span class="label">Reporting Time:</span> 10:00 AM</div>
+            <div class="detail-row"><span class="label">Venue:</span> {{ company.location }}</div>
+            <div class="detail-row"><span class="label">Contact Person:</span> {{ company.contact_person }} ({{ company.contact_phone }})</div>
+        </div>
+        
+        <h3>Documents Required at Joining:</h3>
+        <ol>
+            <li>10th Marksheet & Certificate</li>
+            <li>12th Marksheet & Certificate</li>
+            <li>All Graduation Semester Marksheets</li>
+            <li>College ID Card</li>
+            <li>PAN Card</li>
+            <li>Aadhaar Card</li>
+            <li>Passport size photographs (4 copies)</li>
+        </ol>
+        
+        <h3>Acceptance:</h3>
+        <p>Please confirm your acceptance of this offer by signing the duplicate copy of this letter and returning it to us within 7 days. You may also confirm via email at {{ company.contact_email }}.</p>
+        
+        <div class="signature">
+            <p>We look forward to welcoming you to the {{ company.company_name }} family!</p>
+            
+            <p>Yours sincerely,</p>
+            
+            <br><br>
+            <p>_________________________<br>
+            {{ company.contact_person }}<br>
+            HR Manager<br>
+            {{ company.company_name }}</p>
+        </div>
+        
+        <div style="margin-top: 50px; border-top: 1px dashed #ccc; padding-top: 20px;">
+            <p><strong>ACCEPTANCE COPY</strong></p>
+            <p>I, {{ student.full_name }}, accept the offer of employment for the position of {{ job.title }} at {{ company.company_name }}.</p>
+            
+            <p>Signature: _________________________ Date: ______________</p>
+        </div>
+    </div>
+    
+    <div class="footer">
+        <p>This is a system-generated offer letter. For any queries, contact placement cell.</p>
+    </div>
+</body>
+</html>

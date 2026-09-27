@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Campus Placement System</title>
+    <!-- Material Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
+        body {
+            font-family: 'Roboto', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-lg border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <a href="{{ url_for('index') }}" class="text-xl font-bold text-blue-600">
+                        CampusPlacement
+                    </a>
+                    {% if current_user.is_authenticated %}
+                    <div class="hidden md:flex ml-10 space-x-8">
+                        <a href="{{ url_for('dashboard') }}" class="text-gray-700 hover:text-blue-600 px-3 py-2 text-sm font-medium">
+                            Dashboard
+                        </a>
+                        {% if current_user.role == 'student' %}
+                        <a href="{{ url_for('student_jobs') }}" class="text-gray-700 hover:text-blue-600 px-3 py-2 text-sm font-medium">
+                            Jobs
+                        </a>
+                        <a href="{{ url_for('student_applications') }}" class="text-gray-700 hover:text-blue-600 px-3 py-2 text-sm font-medium">
+                            Applications
+                        </a>
+                        {% elif current_user.role == 'company' %}
+                        <a href="{{ url_for('post_job') }}" class="text-gray-700 hover:text-blue-600 px-3 py-2 text-sm font-medium">
+                            Post Job
+                        </a>
+                        <a href="{{ url_for('company_jobs') }}" class="text-gray-700 hover:text-blue-600 px-3 py-2 text-sm font-medium">
+                            Manage Jobs
+                        </a>
+                        {% elif current_user.role == 'placement' %}
+                        <a href="{{ url_for('create_drive') }}" class="text-gray-700 hover:text-blue-600 px-3 py-2 text-sm font-medium">
+                            Create Drive
+                        </a>
+                        <a href="{{ url_for('placement_drives') }}" class="text-gray-700 hover:text-blue-600 px-3 py-2 text-sm font-medium">
+                            Drives
+                        </a>
+                        <a href="{{ url_for('placement_stats') }}" class="text-gray-700 hover:text-blue-600 px-3 py-2 text-sm font-medium">
+                            Statistics
+                        </a>
+                        {% elif current_user.role == 'admin' %}
+                        <a href="{{ url_for('manage_students') }}" class="text-gray-700 hover:text-blue-600 px-3 py-2 text-sm font-medium">
+                            Students
+                        </a>
+                        <a href="{{ url_for('manage_companies') }}" class="text-gray-700 hover:text-blue-600 px-3 py-2 text-sm font-medium">
+                            Companies
+                        </a>
+                        <a href="{{ url_for('admin_reports') }}" class="text-gray-700 hover:text-blue-600 px-3 py-2 text-sm font-medium">
+                            Reports
+                        </a>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <div class="flex items-center">
+                    {% if current_user.is_authenticated %}
+                    <div class="relative group">
+                        <button class="flex items-center space-x-3 focus:outline-none">
+                            <span class="material-icons text-gray-600">account_circle</span>
+                            <span class="text-sm text-gray-700">{{ current_user.username }}</span>
+                            <span class="material-icons text-gray-400 text-sm">arrow_drop_down</span>
+                        </button>
+                        <div class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-1 border border-gray-200 hidden group-hover:block">
+                            <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Profile</a>
+                            <a href="{{ url_for('logout') }}" class="block px-4 py-2 text-sm text-red-600 hover:bg-gray-100">Logout</a>
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="space-x-4">
+                        <a href="{{ url_for('login') }}" class="text-gray-700 hover:text-blue-600 px-3 py-2 text-sm font-medium">
+                            Login
+                        </a>
+                        <div class="relative inline-block group">
+                            <button class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 focus:outline-none">
+                                Register
+                            </button>
+                            <div class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-1 border border-gray-200 hidden group-hover:block">
+                                <a href="{{ url_for('register_student') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">As Student</a>
+                                <a href="{{ url_for('register_company') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">As Company</a>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Flash Messages -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                <div class="mb-4 p-4 rounded-lg {% if category == 'success' %}bg-green-100 text-green-700{% elif category == 'danger' %}bg-red-100 text-red-700{% else %}bg-blue-100 text-blue-700{% endif %}">
+                    {{ message }}
+                </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+
+    <!-- Main Content -->
+    <main class="py-6">
+        {% block content %}{% endblock %}
+    </main>
+</body>
+</html>

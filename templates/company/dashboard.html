@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <!-- Welcome Section -->
+    <div class="bg-gradient-to-r from-green-500 to-green-600 text-white p-6 rounded-lg mb-6">
+        <h1 class="text-2xl font-bold mb-2">Welcome, {{ company.company_name }}!</h1>
+        <p class="text-green-100">Manage your job postings and applications</p>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="grid md:grid-cols-4 gap-6 mb-8">
+        <div class="bg-white p-6 rounded-lg shadow-md">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-gray-500 text-sm">Active Jobs</p>
+                    <p class="text-2xl font-bold">{{ jobs|selectattr('status', 'equalto', 'active')|list|length }}</p>
+                </div>
+                <span class="material-icons text-green-500 text-3xl">work</span>
+            </div>
+        </div>
+        
+        <div class="bg-white p-6 rounded-lg shadow-md">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-gray-500 text-sm">Total Applications</p>
+                    <p class="text-2xl font-bold">{{ total_applications }}</p>
+                </div>
+                <span class="material-icons text-blue-500 text-3xl">people</span>
+            </div>
+        </div>
+        
+        <div class="bg-white p-6 rounded-lg shadow-md">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-gray-500 text-sm">Shortlisted</p>
+                    <p class="text-2xl font-bold">0</p>
+                </div>
+                <span class="material-icons text-yellow-500 text-3xl">checklist</span>
+            </div>
+        </div>
+        
+        <div class="bg-white p-6 rounded-lg shadow-md">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-gray-500 text-sm">Selected</p>
+                    <p class="text-2xl font-bold">0</p>
+                </div>
+                <span class="material-icons text-purple-500 text-3xl">celebration</span>
+            </div>
+        </div>
+    </div>
+
+    {% if not company.verified %}
+    <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6">
+        <div class="flex">
+            <div class="flex-shrink-0">
+                <span class="material-icons text-yellow-400">warning</span>
+            </div>
+            <div class="ml-3">
+                <p class="text-sm text-yellow-700">
+                    Your company is pending verification. You cannot post jobs until verified.
+                </p>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Recent Jobs -->
+    <div class="bg-white rounded-lg shadow-md p-6">
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="text-xl font-bold">Recent Job Postings</h2>
+            <a href="{{ url_for('post_job') }}" class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700">
+                + Post New Job
+            </a>
+        </div>
+        
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead>
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Job Title</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Posted Date</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Last Date</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Applications</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    {% for job in jobs %}
+                    <tr>
+                        <td class="px-6 py-4 whitespace-nowrap">{{ job.title }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">{{ job.posted_date.strftime('%d-%m-%Y') }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">{{ job.last_date.strftime('%d-%m-%Y') }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">{{ job.applications|length }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {% if job.status == 'active' %}bg-green-100 text-green-800{% else %}bg-gray-100 text-gray-800{% endif %}">
+                                {{ job.status }}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <a href="{{ url_for('job_applications', job_id=job.id) }}" class="text-blue-600 hover:text-blue-900 mr-3">
+                                View Applications
+                            </a>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="6" class="px-6 py-4 text-center text-gray-500">No jobs posted yet</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <!-- Hero Section -->
+    <div class="text-center py-12">
+        <h1 class="text-4xl font-bold text-gray-900 mb-4">
+            Welcome to Campus Placement System
+        </h1>
+        <p class="text-xl text-gray-600 mb-8">
+            Connect students with top companies for exciting career opportunities
+        </p>
+        {% if not current_user.is_authenticated %}
+        <div class="space-x-4">
+            <a href="{{ url_for('register_student') }}" 
+               class="bg-blue-600 text-white px-6 py-3 rounded-lg text-lg font-medium hover:bg-blue-700">
+                Register as Student
+            </a>
+            <a href="{{ url_for('register_company') }}" 
+               class="bg-green-600 text-white px-6 py-3 rounded-lg text-lg font-medium hover:bg-green-700">
+                Register as Company
+            </a>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Features Section -->
+    <div class="grid md:grid-cols-3 gap-8 py-12">
+        <div class="bg-white p-6 rounded-lg shadow-md text-center">
+            <span class="material-icons text-blue-600 text-4xl mb-4">school</span>
+            <h3 class="text-xl font-semibold mb-2">For Students</h3>
+            <p class="text-gray-600">
+                Browse jobs, track applications, and get placed in your dream company
+            </p>
+        </div>
+        
+        <div class="bg-white p-6 rounded-lg shadow-md text-center">
+            <span class="material-icons text-green-600 text-4xl mb-4">business</span>
+            <h3 class="text-xl font-semibold mb-2">For Companies</h3>
+            <p class="text-gray-600">
+                Post jobs, manage applications, and find the best talent
+            </p>
+        </div>
+        
+        <div class="bg-white p-6 rounded-lg shadow-md text-center">
+            <span class="material-icons text-purple-600 text-4xl mb-4">analytics</span>
+            <h3 class="text-xl font-semibold mb-2">Track Progress</h3>
+            <p class="text-gray-600">
+                Real-time updates and comprehensive placement statistics
+            </p>
+        </div>
+    </div>
+
+    <!-- Stats Section -->
+    <div class="bg-blue-600 text-white py-12 rounded-lg mb-12">
+        <div class="grid md:grid-cols-3 gap-8 text-center">
+            <div>
+                <div class="text-3xl font-bold mb-2">500+</div>
+                <div class="text-blue-100">Students Placed</div>
+            </div>
+            <div>
+                <div class="text-3xl font-bold mb-2">100+</div>
+                <div class="text-blue-100">Partner Companies</div>
+            </div>
+            <div>
+                <div class="text-3xl font-bold mb-2">95%</div>
+                <div class="text-blue-100">Placement Rate</div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

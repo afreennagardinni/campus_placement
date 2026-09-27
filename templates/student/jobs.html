@@ -1,0 +1,203 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="mb-6">
+        <h1 class="text-2xl font-bold">Available Jobs</h1>
+        <p class="text-gray-600">Browse and apply for jobs that match your profile</p>
+    </div>
+
+    <!-- Filters Section -->
+    <div class="bg-white p-4 rounded-lg shadow-md mb-6">
+        <div class="grid md:grid-cols-4 gap-4">
+            <!-- Search by title/company -->
+            <input type="text" id="searchJob" placeholder="Search jobs..." 
+                   class="border rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500"
+                   onkeyup="filterJobs()">
+            
+            <!-- Department Filter -->
+            <select id="departmentFilter" class="border rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500" onchange="filterJobs()">
+                <option value="all">All Departments</option>
+                <option value="CSE">CSE</option>
+                <option value="ECE">ECE</option>
+                <option value="EEE">EEE</option>
+                <option value="MECH">MECH</option>
+                <option value="CIVIL">CIVIL</option>
+                <option value="IT">IT</option>
+            </select>
+            
+            <!-- Job Type Filter -->
+            <select id="typeFilter" class="border rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500" onchange="filterJobs()">
+                <option value="all">Job Type</option>
+                <option value="Full Time">Full Time</option>
+                <option value="Internship">Internship</option>
+                <option value="Contract">Contract</option>
+            </select>
+            
+            <!-- Filter Button -->
+            <button onclick="filterJobs()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
+                Apply Filters
+            </button>
+        </div>
+    </div>
+
+    <!-- Jobs List -->
+    <div id="jobsContainer" class="space-y-4">
+        {% for job in jobs %}
+        <div class="job-card bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition" 
+             data-title="{{ job.title|lower }}"
+             data-company="{{ job.company.company_name|lower }}"
+             data-department="{{ job.eligible_branches|default('all')|lower }}"
+             data-type="{{ job.job_type|lower }}">
+            
+            <div class="flex justify-between items-start">
+                <div class="flex-1">
+                    <div class="flex items-center mb-2">
+                        <h2 class="text-xl font-bold mr-3">{{ job.title }}</h2>
+                        {% if job.job_type == 'internship' %}
+                        <span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded">Internship</span>
+                        {% endif %}
+                    </div>
+                    
+                    <p class="text-gray-600 mb-2">{{ job.company.company_name }}</p>
+                    
+                    <div class="grid md:grid-cols-3 gap-4 mb-3 text-sm">
+                        <div class="flex items-center text-gray-500">
+                            <span class="material-icons text-sm mr-1">location_on</span>
+                            {{ job.location }}
+                        </div>
+                        <div class="flex items-center text-gray-500">
+                            <span class="material-icons text-sm mr-1">attach_money</span>
+                            {{ job.salary }}
+                        </div>
+                        <div class="flex items-center text-gray-500">
+                            <span class="material-icons text-sm mr-1">event</span>
+                            Last Date: {{ job.last_date.strftime('%d-%m-%Y') }}
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <p class="text-sm text-gray-600"><span class="font-semibold">Requirements:</span> {{ job.requirements[:150] }}...</p>
+                    </div>
+                    
+                    <div class="flex items-center space-x-4 text-sm">
+                        <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded">Min CGPA: {{ job.min_cgpa }}</span>
+                        <span class="bg-purple-100 text-purple-800 px-2 py-1 rounded">Experience: {{ job.experience_required }}</span>
+                    </div>
+                </div>
+                
+                <div class="ml-6">
+                    {% if job.id in applied_jobs %}
+                    <button class="bg-gray-300 text-gray-600 px-6 py-2 rounded-lg cursor-not-allowed" disabled>
+                        Applied
+                    </button>
+                    {% else %}
+                    <a href="{{ url_for('apply_job', job_id=job.id) }}" 
+                       class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 inline-block">
+                        Apply Now
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="bg-white rounded-lg shadow-md p-12 text-center">
+            <span class="material-icons text-6xl text-gray-400 mb-4">work_off</span>
+            <h3 class="text-xl font-semibold text-gray-600 mb-2">No Jobs Available</h3>
+            <p class="text-gray-500">Check back later for new opportunities</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- JavaScript for Filtering -->
+<script>
+function filterJobs() {
+    // Get filter values
+    let searchTerm = document.getElementById('searchJob').value.toLowerCase();
+    let department = document.getElementById('departmentFilter').value.toLowerCase();
+    let jobType = document.getElementById('typeFilter').value.toLowerCase();
+    
+    // Get all job cards
+    let jobs = document.getElementsByClassName('job-card');
+    let visibleCount = 0;
+    
+    // Loop through all jobs
+    for (let i = 0; i < jobs.length; i++) {
+        let job = jobs[i];
+        
+        // Get job data attributes
+        let title = job.dataset.title || '';
+        let company = job.dataset.company || '';
+        let jobDept = job.dataset.department || 'all';
+        let jobTypeAttr = job.dataset.type || '';
+        
+        // Check search match (title or company)
+        let searchMatch = searchTerm === '' || 
+                         title.includes(searchTerm) || 
+                         company.includes(searchTerm);
+        
+        // Check department match
+        let deptMatch = department === 'all' || 
+                       jobDept.includes(department) || 
+                       jobDept === 'all';
+        
+        // Check job type match
+        let typeMatch = jobType === 'all' || 
+                       jobType === '' || 
+                       jobTypeAttr.includes(jobType);
+        
+        // Show/hide based on all filters
+        if (searchMatch && deptMatch && typeMatch) {
+            job.style.display = 'block';
+            visibleCount++;
+        } else {
+            job.style.display = 'none';
+        }
+    }
+    
+    // Show "no results" message if needed
+    let container = document.getElementById('jobsContainer');
+    let noResults = document.getElementById('noResultsMessage');
+    
+    if (visibleCount === 0 && jobs.length > 0) {
+        if (!noResults) {
+            noResults = document.createElement('div');
+            noResults.id = 'noResultsMessage';
+            noResults.className = 'bg-white rounded-lg shadow-md p-12 text-center';
+            noResults.innerHTML = `
+                <span class="material-icons text-6xl text-gray-400 mb-4">search_off</span>
+                <h3 class="text-xl font-semibold text-gray-600 mb-2">No Matching Jobs</h3>
+                <p class="text-gray-500">Try different filters or check back later</p>
+            `;
+            container.appendChild(noResults);
+        }
+    } else {
+        if (noResults) {
+            noResults.remove();
+        }
+    }
+}
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', function() {
+    filterJobs();
+});
+</script>
+
+<!-- Optional: Add Reset Filters button -->
+<div class="mt-4 text-center">
+    <button onclick="resetFilters()" class="text-blue-600 hover:text-blue-800 text-sm">
+        Reset All Filters
+    </button>
+</div>
+
+<script>
+function resetFilters() {
+    document.getElementById('searchJob').value = '';
+    document.getElementById('departmentFilter').value = 'all';
+    document.getElementById('typeFilter').value = 'all';
+    filterJobs();
+}
+</script>
+{% endblock %}
